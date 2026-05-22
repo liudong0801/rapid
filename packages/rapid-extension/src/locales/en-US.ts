@@ -29,6 +29,8 @@ const resource: LocaleResource = {
     updateSuccess: "Update success.",
     updateError: "Failed to update: {{message}}",
     uploadButtonText: "Select file",
+    selectRequiredMessage: "Please select ${label}",
+    inputRequiredMessage: "Please enter ${label}",
   },
 };
 

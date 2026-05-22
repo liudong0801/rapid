@@ -42,23 +42,6 @@ const fieldTypeToFormItemTypeMap: Record<RapidFieldType, RapidFormItemType | nul
   richText: "richText",
 };
 
-const validationMessagesByFieldType: Partial<Record<RapidFieldType, any>> = {
-  option: {
-    // eslint-disable-next-line no-template-curly-in-string
-    required: "请选择${label}",
-  },
-
-  relation: {
-    // eslint-disable-next-line no-template-curly-in-string
-    required: "请选择${label}",
-  },
-};
-
-const defaultValidationMessages = {
-  // eslint-disable-next-line no-template-curly-in-string
-  required: "请输入${label}",
-};
-
 export interface GenerateEntityFormItemOption {
   formItemConfig: RapidFormItemConfig;
   rpdField?: RapidField;
@@ -338,6 +321,24 @@ export default {
     const formConfig = props;
     const mainEntityCode = formConfig.entityCode;
     const mainEntity = rapidAppDefinition.getEntityByCode(mainEntityCode);
+
+    const validationMessagesByFieldType: Partial<Record<RapidFieldType, any>> = {
+      option: {
+        // eslint-disable-next-line no-template-curly-in-string
+        required: getExtensionLocaleStringResource(framework, "selectRequiredMessage"),
+      },
+
+      relation: {
+        // eslint-disable-next-line no-template-curly-in-string
+        required: getExtensionLocaleStringResource(framework, "selectRequiredMessage"),
+      },
+    };
+
+    const defaultValidationMessages = {
+      // eslint-disable-next-line no-template-curly-in-string
+      required: getExtensionLocaleStringResource(framework, "inputRequiredMessage"),
+    };
+
     if (!mainEntity) {
       const errorRockConfig = generateRockConfigOfError(new Error(`Entitiy with code '${mainEntityCode}' not found.`));
       return renderRock({ context, rockConfig: errorRockConfig });
