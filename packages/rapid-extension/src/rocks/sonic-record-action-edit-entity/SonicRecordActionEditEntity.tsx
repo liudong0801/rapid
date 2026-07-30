@@ -27,11 +27,12 @@ export default {
 
 function renderActionWithDefaultForm(context: RockInstanceContext, props: SonicRecordActionEditEntityRockConfig) {
   const { framework } = context;
-  const slotIndex = props.$slot.index || "0";
+  // const slotIndex = props.$slot.index || "0";
+  const entityId = props.$slot.record.id;
 
   const rockConfig: RapidTableActionRockConfig = {
     ...(MoveStyleUtils.omitSystemRockConfigFields(props) as SonicRecordActionEditEntityConfig),
-    $id: `${props.$id}-link-${slotIndex}`,
+    $id: `${props.$id}-link-${entityId}`,
     $type: "rapidTableAction",
     actionText: props.actionText || getExtensionLocaleStringResource(framework, "edit"),
     onAction: [
@@ -49,7 +50,7 @@ function renderActionWithDefaultForm(context: RockInstanceContext, props: SonicR
 }
 
 function renderActionWithSpecifiedForm(context: RockInstanceContext, props: SonicRecordActionEditEntityRockConfig) {
-  const slotIndex = props.$slot.index || "0";
+  // const slotIndex = props.$slot.index || "0";
   const entityId = props.$slot.record.id;
   const scopeId = context.scope.config.$id;
   const { entityCode, form, dataSourceCode } = props;
@@ -105,7 +106,7 @@ function renderActionWithSpecifiedForm(context: RockInstanceContext, props: Soni
     onModalOpen: [
       {
         $action: "loadStoreData",
-        scope: `${props.$id}-action-${slotIndex}`,
+        scope: `${props.$id}-action-${entityId}`,
         storeName: "detail",
       },
     ],

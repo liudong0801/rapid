@@ -17,8 +17,9 @@ export default {
     const { resetFormOnModalOpen } = props;
 
     // TODO: need a better implementation. a component should not care about whether it's in a slot.
-    const slotIndex = props.$slot.index || "0";
-    const formRockId = `${props.$id}-form-${slotIndex}`;
+    // const slotIndex = props.$slot.index || "0";
+    const recordId = props.$slot.record.id || props.$slot.index || "0";
+    const formRockId = `${props.$id}-form-${recordId}`;
     const formRockConfig = cloneDeep(props.form) as RapidFormRockConfig;
     formRockConfig.$id = formRockId;
 
@@ -89,7 +90,7 @@ export default {
 
     const actionLinkRockConfig: RockConfig = {
       ...MoveStyleUtils.omitSystemRockConfigFields(props),
-      $id: `${props.$id}-link-${slotIndex}`,
+      $id: `${props.$id}-link-${recordId}`,
       $type: "rapidTableAction",
       onAction: [
         {
@@ -119,7 +120,7 @@ export default {
 
     const modalRockConfig: RockConfig = {
       $type: "antdModal",
-      $id: `${props.$id}-modal-${slotIndex}`,
+      $id: `${props.$id}-modal-${recordId}`,
       title: props.modalTitle || props.text,
       $exps: {
         open: "!!$scope.vars['modal-open']",
@@ -154,7 +155,7 @@ export default {
 
     const rockConfig: RockConfig = {
       $type: "scope",
-      $id: `${props.$id}-scope-${slotIndex}`,
+      $id: `${props.$id}-scope-${recordId}`,
       children: [actionLinkRockConfig, modalRockConfig],
     };
 
