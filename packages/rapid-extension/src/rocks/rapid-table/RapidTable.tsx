@@ -130,18 +130,61 @@ export default {
     const [tableHeight, setTableHeight] = useState<number | undefined>(undefined);
 
     const { window, document } = global;
-    const viewPortHeight = window?.innerHeight || document?.documentElement.clientHeight || document?.body.clientHeight;
-    const tableHeader = document.querySelector(".ant-table-thead");
-    let headerBottom = 0;
-    if (tableHeader) {
-      headerBottom = tableHeader.getBoundingClientRect().bottom;
-    }
+
+    const updateTableHeight = () => {
+      if (!tableRef.current || !props.tableAutoHeight) {
+        return;
+      }
+
+      const viewPortHeight = window?.innerHeight || document?.documentElement.clientHeight || document?.body.clientHeight;
+
+      const tableElement = tableRef.current;
+      const tableHeader = tableElement.querySelector?.(".ant-table-thead");
+
+      let tableBodyTop;
+
+      if (tableHeader) {
+        tableBodyTop = tableHeader.getBoundingClientRect().bottom;
+      } else {
+        tableBodyTop = tableElement.getBoundingClientRect().top;
+      }
+
+      const tableHeight = viewPortHeight - tableBodyTop - 88;
+
+      if (tableHeight > 0) {
+        setTableHeight(tableHeight);
+      }
+    };
 
     useEffect(() => {
-      if (tableRef.current && props.tableAutoHeight) {
-        setTableHeight(viewPortHeight - headerBottom - 88);
+      if (!props.tableAutoHeight || !tableRef.current) {
+        return;
       }
-    }, [tableRef.current, viewPortHeight]);
+
+      updateTableHeight();
+
+      const tableElement = tableRef.current;
+
+      const resizeObserver = new ResizeObserver(() => {
+        updateTableHeight();
+      });
+
+      const entityListElement = tableElement.closest?.(".sonic-entity-list");
+
+      const pageSectionElement = tableElement.closest?.(".rui-page-section");
+
+      if (entityListElement) {
+        resizeObserver.observe(entityListElement);
+      }
+
+      if (pageSectionElement && pageSectionElement !== entityListElement) {
+        resizeObserver.observe(pageSectionElement);
+      }
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, [props.tableAutoHeight]);
 
     const columns = filter(props.columns, (column) => !column._hidden);
 
@@ -228,7 +271,7 @@ export default {
               }
               return (
                 <Table.Summary.Cell key={index} index={index}>
-                  {summaryResult}
+                  {summaryCellContent}
                 </Table.Summary.Cell>
               );
             })}
