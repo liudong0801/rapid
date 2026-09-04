@@ -294,6 +294,10 @@ export default {
       };
     }
 
+    const pagination = {
+      defaultPageSize: props.pageSize,
+      ...props.tableProps?.pagination,
+    };
     const dataSourceTotal = (props.dataSource || []).length;
 
     const scopeVarExp = "$scope";
@@ -307,13 +311,17 @@ export default {
     if (props.dataSourceType !== "dataSource") {
       tableExps = {
         dataSource: `${storeScopeVarExp}.stores.${dataSourceCode}?.data?.list`,
-        pagination:
-          props.pageSize > 0
-            ? `{pageSize: ${
-                props.pageSize
-              }, current: ${storeScopeVarExp}.vars["${`stores-${dataSourceCode}-pageNum`}"], total: ${storeScopeVarExp}.stores.${dataSourceCode}?.data?.total}`
-            : "false",
+        // pagination:
+        //   props.pageSize > 0
+        //     ? `{pageSize: ${
+        //         props.pageSize
+        //       }, current: ${storeScopeVarExp}.vars["${`stores-${dataSourceCode}-pageNum`}"], total: ${storeScopeVarExp}.stores.${dataSourceCode}?.data?.total}`
+        //     : "false",
       };
+      if (props.pageSize > 0) {
+        tableExps["pagination.current"] = `${storeScopeVarExp}.vars["${`stores-${dataSourceCode}-pageNum`}"]`;
+        tableExps["pagination.total"] = `${storeScopeVarExp}.stores.${dataSourceCode}?.data?.total`;
+      }
     }
 
     if (typeof props.getRowSelectionCheckboxProps === "string" && trim(props.getRowSelectionCheckboxProps)) {
@@ -346,6 +354,7 @@ export default {
       expandedRow: props.expandedRow,
       showHeader: props.showHeader,
       ...props.tableProps,
+      pagination: props.pageSize > 0 ? pagination : false,
       convertListToTree: props.convertListToTree,
       dataSourceAdapter: props.dataSourceAdapter,
       beforeSubmitFormDataAdapter: props.beforeSubmitFormDataAdapter,
@@ -413,8 +422,8 @@ export default {
 
             const store: EntityStore = storeScope.stores[dataSourceCode] as any;
             store.setPagination({
-              limit: props.pageSize,
-              offset: ((pagination.current || 1) - 1) * props.pageSize,
+              limit: pagination.pageSize,
+              offset: ((pagination.current || 1) - 1) * pagination.pageSize,
             });
             await store.loadData();
           },
