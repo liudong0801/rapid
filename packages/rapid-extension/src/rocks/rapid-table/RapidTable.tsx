@@ -139,20 +139,43 @@ export default {
       const viewPortHeight = window?.innerHeight || document?.documentElement.clientHeight || document?.body.clientHeight;
 
       const tableElement = tableRef.current;
+
+      if (tableElement.offsetParent === null) {
+        return;
+      }
+
       const tableHeader = tableElement.querySelector?.(".ant-table-thead");
 
       let tableBodyTop;
 
       if (tableHeader) {
-        tableBodyTop = tableHeader.getBoundingClientRect().bottom;
+        const headerRect = tableHeader.getBoundingClientRect();
+
+        if (headerRect.height === 0 || headerRect.bottom <= 0) {
+          return;
+        }
+
+        tableBodyTop = headerRect.bottom;
       } else {
-        tableBodyTop = tableElement.getBoundingClientRect().top;
+        const tableRect = tableElement.getBoundingClientRect();
+
+        if (tableRect.height === 0 || tableRect.top < 0) {
+          return;
+        }
+
+        tableBodyTop = tableRect.top;
       }
 
-      const tableHeight = viewPortHeight - tableBodyTop - 88;
+      const newTableHeight = viewPortHeight - tableBodyTop - 88;
 
-      if (tableHeight > 0) {
-        setTableHeight(tableHeight);
+      if (newTableHeight > 0) {
+        setTableHeight((oldTableHeight) => {
+          if (oldTableHeight === newTableHeight) {
+            return oldTableHeight;
+          }
+
+          return newTableHeight;
+        });
       }
     };
 
